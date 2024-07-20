@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
+    "@primevue/themes": "^4.0.0",
     "axios": "^1.7.2",
+    "primevue": "^3.53.0",
+    "tailwindcss-primeui": "^0.3.4",
     "vue": "^3.4.31",
     "vue-router": "^4.4.0",
     "vue-select": "^4.0.0-beta.6"

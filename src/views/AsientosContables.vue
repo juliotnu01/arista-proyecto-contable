@@ -111,36 +111,107 @@
                                             <label for="">
                                                 Numero de documento
                                             </label>
-                                            <input type="text" v-model="numeroDocumento"  class="h-8 border mt-1 rounded px-4 w-full bg-gray-50" />
+                                            <input type="text" v-model="numeroDocumento"
+                                                class="h-8 border mt-1 rounded px-4 w-full bg-gray-50" />
                                         </div>
-                                        
+
                                     </div>
                                     <div class="py-4 max-h-96 overflow-y-scroll">
                                         <tableComponent :data="DataTableAsientos">
                                             <template v-slot:body="{ row }">
-                                                <td
-                                                    class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    {{ row.puc_id }}
+                                                <td v-if="row.editar">
+                                                    <div class="flex justify-center gap-4">
+                                                        <button @click.prevent="EditAsiento(row)"
+                                                            class="w-fit h-fit p-2  text-sm font-medium    rounded-full block  border-b border-green-300 bg-green-200 hover:bg-green-300 text-green-900">
+                                                            <svg width="15px" height="15px" viewBox="0 0 24 24"
+                                                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M4 12.6111L8.92308 17.5L20 6.5"
+                                                                    stroke="#000000" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-sm  whitespace-nowrap text-center">
+                                                    <div v-if="!row.editar">
+                                                        {{ row.puc_id }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
+                                                            v-model="row.codigo"
+                                                            @change="handlePucEditAsiento($event, row)"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                            class="absolute">
+                                                            <option v-for="(puc, p) in pucs" :key="p"
+                                                                :value="`${puc.puc_nomb} ${puc.puc_codi}`"
+                                                                :data-custom="puc.puc_codi" />
+
+                                                        </datalist>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
+                                                    <div v-if="!row.editar">
+                                                        {{ row.asco_conc }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="text"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                    </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    {{ row.asco_conc }}
+                                                    <div v-if="!row.editar">
+                                                        {{ row.terc_id }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
+                                                            v-model="row.codigo"
+                                                            @change="handlePucEditAsiento($event, row)"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                            class="absolute">
+                                                            <option v-for="(puc, p) in pucs" :key="p"
+                                                                :value="`${puc.puc_nomb} ${puc.puc_codi}`"
+                                                                :data-custom="puc.puc_codi" />
+
+                                                        </datalist>
+                                                    </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    {{ row.terc_id }}
+                                                    <div v-if="!row.editar">
+                                                        {{ row.ceco_id }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
+                                                            v-model="row.codigo"
+                                                            @change="handlePucEditAsiento($event, row)"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                            class="absolute">
+                                                            <option v-for="(puc, p) in pucs" :key="p"
+                                                                :value="`${puc.puc_nomb} ${puc.puc_codi}`"
+                                                                :data-custom="puc.puc_codi" />
+
+                                                        </datalist>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
+                                                    <div v-if="!row.editar">
+                                                        $ {{ formatter.format(row.asco_debi) }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="number"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                    </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    {{ row.ceco_id }}
-                                                </td>
-                                                <td
-                                                    class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    $ {{ formatter.format(row.asco_debi) }}
-                                                </td>
-                                                <td
-                                                    class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    $ {{ formatter.format(row.asco_cred) }}
+                                                    <div v-if="!row.editar">
+                                                        $ {{ formatter.format(row.asco_cred) }}
+                                                    </div>
+                                                    <div class="m-4 relative" v-else>
+                                                        <input type="number"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                    </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
@@ -166,7 +237,7 @@
                                                                 </g>
                                                             </svg>
                                                         </button>
-                                                        <button
+                                                        <button v-if="!row.editar"  @click.prevent="EditAsiento(row)"
                                                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-orange-300 bg-orange-200 hover:bg-orange-300 text-orange-900">
                                                             <svg width="15px" height="15px" viewBox="0 0 24 24"
                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -286,6 +357,8 @@ const selectedPeriodoDesc = ref(null);
 const selectedTipoDocumentoDesc = ref(null);
 const FechaDocumento = ref(null);
 const numeroDocumento = ref(null);
+const pucs = ref(null);
+const pucSelectedDec = ref(null);
 
 
 const getDocumentos = async () => {
@@ -296,8 +369,14 @@ const getDocumentos = async () => {
 
             for (const iterator of documento.asientos_contables) {
                 iterator.editar = false
+                iterator.codigo = ''
+                iterator.concepto = ''
+                iterator.tercero = ''
+                iterator.centro_costo = ''
+                iterator.debito = ''
+                iterator.credito = ''
             }
-            
+
         }
         DataTable.value.body = data
     } catch (error) {
@@ -339,7 +418,14 @@ const getTipoDocumento = async () => {
         console.log(error);
     }
 }
-
+const getPucs = async () => {
+    try {
+        let { data } = await axios('http://localhost:3000/puc')
+        pucs.value = data
+    } catch (error) {
+        console.log(error);
+    }
+}
 const handlePeriodo = (event = null) => {
     const selectedDesc = event.target.value;
     const selectedOption = periodos.value.find(periodo => periodo.peri_desc === selectedDesc);
@@ -354,6 +440,17 @@ const handlePeriodo = (event = null) => {
 
         DeterminateFechaCalendar(data)
     }
+}
+const handlePucEditAsiento = (event = null, asiento) => {
+    const selectedDesc = event.target.value;
+    let codigo = selectedDesc.match(/\d+/g)
+    const selectedOption = pucs.value.find(puc => puc.puc_codi === codigo[0]);
+    if (selectedOption) {
+        pucSelectedDec.value = selectedOption.puc_id;
+    } else {
+        pucSelectedDec.value = null;
+    }
+
 }
 const handleTipoDocumento = (event = null) => {
     const selectedDesc = event.target.value;
@@ -386,11 +483,20 @@ const DeterminateFechaCalendar = (data = null) => {
     maxCalendar.value = new Date(a, mesNumero, 0).toISOString().split('T')[0];
     console.log(minCalendar.value, maxCalendar.value);
 }
+const EditAsiento = async (asiento = null) => {
+    asiento.editar = !asiento.editar
+    if (asiento.editar) {
+        DataTableAsientos.value.cabecera.unshift({ label: '' })
+    } else {
+        DataTableAsientos.value.cabecera.shift()
+    }
+}
 
 onMounted(() => {
     getDocumentos();
     getPeriodo();
     getTipoDocumento();
+    getPucs();
 })
 
 </script>
