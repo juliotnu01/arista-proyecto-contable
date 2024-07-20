@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-full">
+    <div class="min-h-full my-2">
         <nav class="bg-gray-800">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 items-center justify-between">
@@ -10,10 +10,11 @@
                         </div>
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
-                                <router-link :to="{ name: 'home' }" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</router-link>
-                                <router-link :to="{ name: 'asiento.contable' }" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Asiento contable</router-link>
-
-                                
+                                <router-link :to="{ name: 'home' }"
+                                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</router-link>
+                                <router-link :to="{ name: 'asiento.contable' }"
+                                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Asiento
+                                    contable</router-link>
                                 <a href="#"
                                     class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
                                 <a href="#"
@@ -89,6 +90,6 @@
         </header>
     </div>
 </template>
-<script>
+<script setup>
 
 </script>
