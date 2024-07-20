@@ -3,26 +3,26 @@
         <tableComponent :data="DataTable">
             <template v-slot:body="{ row }">
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    {{ row.docu_nume }}
+                    {{ row.item.docu_nume }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    {{ row.docu_fech }}
+                    {{ row.item.docu_fech }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    {{ row.tipoDocummento.tido_nomb ?? '' }}
+                    {{ row.item.tipoDocummento.tido_nomb ?? '' }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    {{ row.periodo.peri_desc ?? '' }}
+                    {{ row.item.periodo.peri_desc ?? '' }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    $ {{ formatter.format(row.docu_cred) }}
+                    $ {{ formatter.format(row.item.docu_cred) }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                    $ {{ formatter.format(row.docu_debi) }}
+                    $ {{ formatter.format(row.item.docu_debi) }}
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
                     <div class="flex justify-center gap-4">
-                        <button @click="EditDocumento(row)"
+                        <button @click="EditDocumento(row.item)"
                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-orange-300 bg-orange-200 hover:bg-orange-300 text-orange-900">
                             <svg width="15px" height="15px" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -114,34 +114,22 @@
                                             <input type="text" v-model="numeroDocumento"
                                                 class="h-8 border mt-1 rounded px-4 w-full bg-gray-50" />
                                         </div>
-
                                     </div>
                                     <div class="py-4 max-h-96 overflow-y-scroll">
                                         <tableComponent :data="DataTableAsientos">
                                             <template v-slot:body="{ row }">
-                                                <td v-if="row.editar">
-                                                    <div class="flex justify-center gap-4">
-                                                        <button @click.prevent="EditAsiento(row)"
-                                                            class="w-fit h-fit p-2  text-sm font-medium    rounded-full block  border-b border-green-300 bg-green-200 hover:bg-green-300 text-green-900">
-                                                            <svg width="15px" height="15px" viewBox="0 0 24 24"
-                                                                fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M4 12.6111L8.92308 17.5L20 6.5"
-                                                                    stroke="#000000" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </td>
                                                 <td class="px-4 py-4 text-sm  whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        {{ row.puc_id }}
+                                                    <div v-if="!row.item.editar">
+                                                        {{ pucs.find(puc => puc.puc_id === row.item.puc_id).puc_nomb }}
+                                                        {{ pucs.find(puc => puc.puc_id === row.item.puc_id).puc_codi }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
-                                                            v-model="row.codigo"
-                                                            @change="handlePucEditAsiento($event, row)"
-                                                            class="h-8 border mt-1 rounded px-4 w-full " />
-                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                        <input type="text"
+                                                            :list="`options-list-puc-${row.item.asco_id}`"
+                                                            v-model="row.item.codigo"
+                                                            @change="handlePucEditAsiento($event, row.item)"
+                                                            class="h-8 border mt-1 rounded px-4 w-fit " />
+                                                        <datalist :id="`options-list-puc-${row.item.asco_id}`"
                                                             class="absolute">
                                                             <option v-for="(puc, p) in pucs" :key="p"
                                                                 :value="`${puc.puc_nomb} ${puc.puc_codi}`"
@@ -152,25 +140,34 @@
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        {{ row.asco_conc }}
+                                                    <div v-if="!row.item.editar">
+                                                        {{ row.item.asco_conc }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text" v-model="row.concepto"
+                                                        <input type="text" v-model="row.item.concepto"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        {{ row.terc_id }}
+                                                    <div v-if="!row.item.editar">
+                                                        {{ terceros.find(puc => puc.terc_id ===
+            row.item.terc_id).terc_nomb1
+                                                        }}
+                                                        {{ terceros.find(puc => puc.terc_id ===
+            row.item.terc_id).terc_apel
+                                                        }}
+                                                        {{ terceros.find(puc => puc.terc_id ===
+            row.item.terc_id).terc_iden
+                                                        }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text" :list="`options-list-tercero-${row.asco_id}`"
-                                                            v-model="row.tercero"
-                                                            @change="handleTerceroEditAsiento($event, row)"
+                                                        <input type="text"
+                                                            :list="`options-list-tercero-${row.item.asco_id}`"
+                                                            v-model="row.item.tercero"
+                                                            @change="handleTerceroEditAsiento($event, row.item)"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
-                                                        <datalist :id="`options-list-tercero-${row.asco_id}`"
+                                                        <datalist :id="`options-list-tercero-${row.item.asco_id}`"
                                                             class="absolute">
                                                             <option v-for="(tercero, p) in terceros" :key="p"
                                                                 :value="`${tercero.terc_nomb1} ${tercero.terc_apel} ${tercero.terc_iden} `" />
@@ -180,47 +177,49 @@
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        {{ row.ceco_id }}
+                                                    <div v-if="!row.item.editar">
+                                                        {{ centroDeCostos.find(centroDeCosto => centroDeCosto.ceco_id
+            === row.item.ceco_id).ceco_nomb }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
-                                                            v-model="row.codigo"
-                                                            @change="handlePucEditAsiento($event, row)"
+                                                        <input type="text"
+                                                            :list="`options-list-centroDeCosto-${row.item.asco_id}`"
+                                                            v-model="row.item.centro_costo"
+                                                            @change="handleCentroDeCosto($event, row.item)"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
-                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                        <datalist :id="`options-list-centroDeCosto-${row.item.asco_id}`"
                                                             class="absolute">
-                                                            <option v-for="(puc, p) in pucs" :key="p"
-                                                                :value="`${puc.puc_nomb} ${puc.puc_codi}`"
-                                                                :data-custom="puc.puc_codi" />
+                                                            <option v-for="(centroDecosto, p) in centroDeCostos"
+                                                                :key="p" :value="centroDecosto.ceco_nomb" />
 
                                                         </datalist>
                                                     </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        $ {{ formatter.format(row.asco_debi) }}
+                                                    <div v-if="!row.item.editar">
+                                                        $ {{ formatter.format(row.item.asco_debi) }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="number" v-model="row.concepto"
+                                                        <input type="number" v-model="row.item.debito"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
-                                                    <div v-if="!row.editar">
-                                                        $ {{ formatter.format(row.asco_cred) }}
+                                                    <div v-if="!row.item.editar">
+                                                        $ {{ formatter.format(row.item.asco_cred) }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="number" v-model="row.concepto"
+                                                        <input type="number" v-model="row.item.credito"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
                                                     class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
                                                     <div class="flex justify-center gap-4">
-                                                        <button
+                                                        <button v-if="!row.item.editar"
+                                                            @click.prevent="clonarAsiento(row)"
                                                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-blue-300 bg-blue-200 hover:bg-blue-300 text-blue-900">
                                                             <svg width="15px" height="15px" viewBox="0 0 32 32"
                                                                 version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +240,8 @@
                                                                 </g>
                                                             </svg>
                                                         </button>
-                                                        <button v-if="!row.editar" @click.prevent="EditAsiento(row)"
+                                                        <button v-if="!row.item.editar"
+                                                            @click.prevent="EditAsiento(row.item)"
                                                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-orange-300 bg-orange-200 hover:bg-orange-300 text-orange-900">
                                                             <svg width="15px" height="15px" viewBox="0 0 24 24"
                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -251,7 +251,35 @@
                                                                     stroke-linecap="round" stroke-linejoin="round" />
                                                             </svg>
                                                         </button>
-                                                        <button
+                                                        <button @click.prevent="EditAsiento(row.item)"
+                                                            v-if="row.item.editar"
+                                                            class="w-fit h-fit p-2  text-sm font-medium    rounded-full block  border-b border-green-300 bg-green-200 hover:bg-green-300 text-green-900">
+                                                            <svg width="15px" height="15px" viewBox="0 0 24 24"
+                                                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M4 12.6111L8.92308 17.5L20 6.5"
+                                                                    stroke="#000000" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <button @click.prevent="cancelEditAsiento(row.item)"
+                                                            v-if="row.item.editar"
+                                                            class="w-fit h-fit p-2  text-sm font-medium    rounded-full block  border-b border-red-300 bg-red-200 hover:bg-red-300 text-red-900">
+                                                            <svg width="15px" height="15px" viewBox="0 0 512 512"
+                                                                version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                                                xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                                <g id="Page-1" stroke="none" stroke-width="1"
+                                                                    fill="none" fill-rule="evenodd">
+                                                                    <g id="work-case" fill="#000000"
+                                                                        transform="translate(91.520000, 91.520000)">
+                                                                        <polygon id="Close"
+                                                                            points="328.96 30.2933333 298.666667 1.42108547e-14 164.48 134.4 30.2933333 1.42108547e-14 1.42108547e-14 30.2933333 134.4 164.48 1.42108547e-14 298.666667 30.2933333 328.96 164.48 194.56 298.666667 328.96 328.96 298.666667 194.56 164.48">
+
+                                                                        </polygon>
+                                                                    </g>
+                                                                </g>
+                                                            </svg>
+                                                        </button>
+                                                        <button v-if="!row.item.editar"
                                                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-red-300 bg-red-200 hover:bg-red-300 text-red-900">
                                                             <svg width="15px" height="15px" viewBox="0 -0.5 21 21"
                                                                 version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -313,12 +341,9 @@
 
 <script setup>
 import tableComponent from '../components/formComponents/tableComponent.vue';
-import inputText from '../components/formComponents/input.vue';
-import selectIntput from '../components/formComponents/select.vue';
-import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import axios from 'axios';
 
 const DataTable = ref({
@@ -365,6 +390,9 @@ const pucs = ref(null);
 const pucSelectedDec = ref(null);
 const terceros = ref([]);
 const terceroSelectedDec = ref(null);
+const centroDeCostos = ref([]);
+const centroDeCostoSelectedDec = ref(null);
+const documentos = ref([])
 
 
 const getDocumentos = async () => {
@@ -384,11 +412,29 @@ const getDocumentos = async () => {
             }
 
         }
-        DataTable.value.body = data
+        documentos.value = data
+        DataTable.value.body = documentos
     } catch (error) {
         console.log(error)
     }
 }
+
+const watchAsientos = (documentIndex, asientoIndex) => {
+    watch(() => documentos.value[documentIndex].asientos_contables[asientoIndex].debito, (newValue, oldValue) => {
+        if (newValue > 0 && newValue !== oldValue) {
+            documentos.value[documentIndex].asientos_contables[asientoIndex].credito = 0;
+        }
+    }
+    );
+
+    watch(() => documentos.value[documentIndex].asientos_contables[asientoIndex].credito, (newValue, oldValue) => {
+        if (newValue > 0 && newValue !== oldValue) {
+            documentos.value[documentIndex].asientos_contables[asientoIndex].debito = 0;
+        }
+    }
+    );
+};
+
 const formatter = new Intl.NumberFormat('es-ES', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -406,8 +452,25 @@ const EditDocumento = async (documento = null) => {
     FechaDocumento.value = docu_fech
     selectedTipoDocumentoDesc.value = tido_nomb
     numeroDocumento.value = docu_nume
+
+    for (let index = 0; index < documento.asientos_contables.length; index++) {
+        const asiento = documento.asientos_contables[index];
+        let codigo = `${pucs.value.find(puc => puc.puc_id === asiento.puc_id).puc_nomb ?? ''} ${pucs.value.find(puc => puc.puc_id === asiento.puc_id).puc_codi ?? ''}`
+        let tercero = `${terceros.value.find(tercero => tercero.terc_id === asiento.terc_id).terc_nomb1 ?? ''} ${terceros.value.find(tercero => tercero.terc_id === asiento.terc_id).terc_apel ?? ''} ${terceros.value.find(tercero => tercero.terc_id === asiento.terc_id).terc_iden ?? ''}`
+        let centro_costo = `${centroDeCostos.value.find(centroDeCosto => centroDeCosto.ceco_id === asiento.ceco_id).ceco_nomb}`
+        asiento.codigo = codigo
+        asiento.concepto = asiento.asco_conc
+        asiento.tercero = tercero
+        asiento.centro_costo = centro_costo
+        asiento.debito = asiento.asco_debi
+        asiento.credito = asiento.asco_cred
+
+    }
+
     DataTableAsientos.value.body = documento.asientos_contables
 }
+
+
 const getPeriodo = async () => {
     try {
         let { data } = await axios('http://localhost:3000/periodo')
@@ -428,6 +491,14 @@ const getTipoTerceros = async () => {
     try {
         let { data } = await axios('http://localhost:3000/terceros')
         terceros.value = data
+    } catch (error) {
+        console.log(error);
+    }
+}
+const getCentroDeCosto = async () => {
+    try {
+        let { data } = await axios('http://localhost:3000/centro-de-costo')
+        centroDeCostos.value = data
     } catch (error) {
         console.log(error);
     }
@@ -477,7 +548,6 @@ const handleTerceroEditAsiento = (event = null, asiento) => {
     }
     console.log({ terceroSelectedDec });
 }
-
 const handleTipoDocumento = (event = null) => {
     const selectedDesc = event.target.value;
     const selectedOption = tiposDocumentos.value.find(tipoDocumento => tipoDocumento.tido_nomb === selectedDesc);
@@ -486,6 +556,17 @@ const handleTipoDocumento = (event = null) => {
     } else {
         selectedTipoDocumento.value = null;
     }
+
+}
+const handleCentroDeCosto = (event = null) => {
+    const selectedDesc = event.target.value;
+    const selectedOption = centroDeCostos.value.find(centroDeCosto => centroDeCosto.ceco_nomb === selectedDesc);
+    if (selectedOption) {
+        centroDeCostoSelectedDec.value = selectedOption.ceco_id;
+    } else {
+        centroDeCostoSelectedDec.value = null;
+    }
+    console.log({ centroDeCostoSelectedDec });
 
 }
 const DeterminateFechaCalendar = (data = null) => {
@@ -511,19 +592,34 @@ const DeterminateFechaCalendar = (data = null) => {
 }
 const EditAsiento = async (asiento = null) => {
     asiento.editar = !asiento.editar
-    if (asiento.editar) {
-        DataTableAsientos.value.cabecera.unshift({ label: '' })
-    } else {
-        DataTableAsientos.value.cabecera.shift()
-    }
+
+}
+const cancelEditAsiento = async (asiento = null) => {
+    asiento.editar = !asiento.editar
+
+}
+const clonarAsiento = (asientoIndex) => {
+    const docu = documentos.value.find(doc => doc.docu_id === asientoIndex.item.docu_id);
+    // Clonar el asiento seleccionado
+    const asientoOriginal = docu.asientos_contables[asientoIndex.index];
+    const nuevoAsiento = { ...asientoOriginal, asco_id: Date.now(), asco_conc: "", debito: 0, credito: 0,  asco_debi: 0, asco_cred: 0, editar: true };
+    // Insertar el nuevo asiento en la posición deseada
+    docu.asientos_contables.splice(asientoIndex.index + 1, 0, nuevoAsiento);
 }
 
-onMounted(() => {
-    getDocumentos();
+
+onMounted(async () => {
+    await getDocumentos();
+    documentos.value.forEach((documento, docIndex) => {
+        documento.asientos_contables.forEach((_, ascoIndex) => {
+            watchAsientos(docIndex, ascoIndex);
+        });
+    });
     getPeriodo();
     getTipoDocumento();
     getPucs();
     getTipoTerceros();
+    getCentroDeCosto();
 })
 
 </script>
