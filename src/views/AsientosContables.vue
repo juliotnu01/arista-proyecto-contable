@@ -150,12 +150,14 @@
                                                         </datalist>
                                                     </div>
                                                 </td>
-                                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
+                                                <td
+                                                    class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
                                                     <div v-if="!row.editar">
                                                         {{ row.asco_conc }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <input type="text" v-model="row.concepto"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
@@ -164,15 +166,14 @@
                                                         {{ row.terc_id }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="text" :list="`options-list-puc-${row.asco_id}`"
-                                                            v-model="row.codigo"
-                                                            @change="handlePucEditAsiento($event, row)"
+                                                        <input type="text" :list="`options-list-tercero-${row.asco_id}`"
+                                                            v-model="row.tercero"
+                                                            @change="handleTerceroEditAsiento($event, row)"
                                                             class="h-8 border mt-1 rounded px-4 w-full " />
-                                                        <datalist :id="`options-list-puc-${row.asco_id}`"
+                                                        <datalist :id="`options-list-tercero-${row.asco_id}`"
                                                             class="absolute">
-                                                            <option v-for="(puc, p) in pucs" :key="p"
-                                                                :value="`${puc.puc_nomb} ${puc.puc_codi}`"
-                                                                :data-custom="puc.puc_codi" />
+                                                            <option v-for="(tercero, p) in terceros" :key="p"
+                                                                :value="`${tercero.terc_nomb1} ${tercero.terc_apel} ${tercero.terc_iden} `" />
 
                                                         </datalist>
                                                     </div>
@@ -196,12 +197,14 @@
                                                         </datalist>
                                                     </div>
                                                 </td>
-                                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
+                                                <td
+                                                    class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap text-center">
                                                     <div v-if="!row.editar">
                                                         $ {{ formatter.format(row.asco_debi) }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="number"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <input type="number" v-model="row.concepto"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
@@ -210,7 +213,8 @@
                                                         $ {{ formatter.format(row.asco_cred) }}
                                                     </div>
                                                     <div class="m-4 relative" v-else>
-                                                        <input type="number"  v-model="row.concepto"  class="h-8 border mt-1 rounded px-4 w-full " />
+                                                        <input type="number" v-model="row.concepto"
+                                                            class="h-8 border mt-1 rounded px-4 w-full " />
                                                     </div>
                                                 </td>
                                                 <td
@@ -237,7 +241,7 @@
                                                                 </g>
                                                             </svg>
                                                         </button>
-                                                        <button v-if="!row.editar"  @click.prevent="EditAsiento(row)"
+                                                        <button v-if="!row.editar" @click.prevent="EditAsiento(row)"
                                                             class="w-fit h-fit p-2  text-sm font-medium    focus:bg-blue-300  rounded-full block  border-b border-orange-300 bg-orange-200 hover:bg-orange-300 text-orange-900">
                                                             <svg width="15px" height="15px" viewBox="0 0 24 24"
                                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -359,6 +363,8 @@ const FechaDocumento = ref(null);
 const numeroDocumento = ref(null);
 const pucs = ref(null);
 const pucSelectedDec = ref(null);
+const terceros = ref([]);
+const terceroSelectedDec = ref(null);
 
 
 const getDocumentos = async () => {
@@ -418,6 +424,14 @@ const getTipoDocumento = async () => {
         console.log(error);
     }
 }
+const getTipoTerceros = async () => {
+    try {
+        let { data } = await axios('http://localhost:3000/terceros')
+        terceros.value = data
+    } catch (error) {
+        console.log(error);
+    }
+}
 const getPucs = async () => {
     try {
         let { data } = await axios('http://localhost:3000/puc')
@@ -452,6 +466,18 @@ const handlePucEditAsiento = (event = null, asiento) => {
     }
 
 }
+const handleTerceroEditAsiento = (event = null, asiento) => {
+    const selectedDesc = event.target.value;
+    let identificacion = selectedDesc.match(/\d+/g)
+    const selectedOption = terceros.value.find(puc => puc.terc_iden === identificacion[0]);
+    if (selectedOption) {
+        terceroSelectedDec.value = selectedOption.terc_id;
+    } else {
+        terceroSelectedDec.value = null;
+    }
+    console.log({ terceroSelectedDec });
+}
+
 const handleTipoDocumento = (event = null) => {
     const selectedDesc = event.target.value;
     const selectedOption = tiposDocumentos.value.find(tipoDocumento => tipoDocumento.tido_nomb === selectedDesc);
@@ -497,6 +523,7 @@ onMounted(() => {
     getPeriodo();
     getTipoDocumento();
     getPucs();
+    getTipoTerceros();
 })
 
 </script>
