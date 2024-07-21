@@ -111,7 +111,7 @@
                                             <label for="">
                                                 Numero de documento
                                             </label>
-                                            <input type="text" v-model="numeroDocumento"
+                                            <input type="text" v-model="numeroDocumento" disabled
                                                 class="h-8 border mt-1 rounded px-4 w-full bg-gray-50" />
                                         </div>
                                     </div>
@@ -323,8 +323,8 @@
                                 </div>
                                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                     <button type="button"
-                                        class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                        @click="open = false">Deactivate</button>
+                                        class="inline-flex w-full justify-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 sm:ml-3 sm:w-auto"
+                                        @click="ActualizarDocumento">Actualizar</button>
                                     <button type="button"
                                         class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                         @click="open = false" ref="cancelButtonRef">Cancel</button>
@@ -393,6 +393,7 @@ const terceroSelectedDec = ref(null);
 const centroDeCostos = ref([]);
 const centroDeCostoSelectedDec = ref(null);
 const documentos = ref([])
+const documentoSelectedForEdit = ref(null);
 
 
 const getDocumentos = async () => {
@@ -441,6 +442,7 @@ const formatter = new Intl.NumberFormat('es-ES', {
 });
 const EditDocumento = async (documento = null) => {
     open.value = true
+    documentoSelectedForEdit.value = documento
     footerDocumento.value.Debito = formatter.format(documento.docu_debi)
     footerDocumento.value.Credito = formatter.format(documento.docu_cred)
     footerDocumento.value.Diferencia = formatter.format((documento.docu_debi - documento.docu_cred))
@@ -588,10 +590,11 @@ const DeterminateFechaCalendar = (data = null) => {
     const mesNumero = meses[mesTexto];
     minCalendar.value = `${a}-${mesNumero}-01`;
     maxCalendar.value = new Date(a, mesNumero, 0).toISOString().split('T')[0];
-    console.log(minCalendar.value, maxCalendar.value);
 }
 const EditAsiento = async (asiento = null) => {
     asiento.editar = !asiento.editar
+
+    console.log();
 
 }
 const cancelEditAsiento = async (asiento = null) => {
@@ -602,13 +605,33 @@ const clonarAsiento = (asientoIndex) => {
     const docu = documentos.value.find(doc => doc.docu_id === asientoIndex.item.docu_id);
     // Clonar el asiento seleccionado
     const asientoOriginal = docu.asientos_contables[asientoIndex.index];
-    const nuevoAsiento = { ...asientoOriginal, asco_id: Date.now(), asco_conc: "", debito: 0, credito: 0,  asco_debi: 0, asco_cred: 0, editar: true };
+    const nuevoAsiento = { ...asientoOriginal, asco_id: Date.now(), asco_conc: "", debito: 0, credito: 0, asco_debi: 0, asco_cred: 0, editar: true };
     // Insertar el nuevo asiento en la posición deseada
     docu.asientos_contables.splice(asientoIndex.index + 1, 0, nuevoAsiento);
 }
 
+const ActualizarDocumento = async () => {
 
-onMounted(async () => {
+    try {
+        let model = {
+            tido_id: selectedTipoDocumento.value ?? documentoSelectedForEdit.value.tido_id,
+            peri_id: selectedPeriodo.value ?? documentoSelectedForEdit.value.peri_id ,
+            docu_nume: documentoSelectedForEdit.value.docu_nume,
+            docu_fech: FechaDocumento.value,
+            docu_debi: parseFloat(footerDocumento.value.Debito),
+            docu_cred: parseFloat(footerDocumento.value.Credito)
+        }
+        await axios.put(`http://localhost:3000/documentos/${documentoSelectedForEdit.value.docu_id}`, model);
+        open.value = false
+        callData();
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const callData = async () => {
+
     await getDocumentos();
     documentos.value.forEach((documento, docIndex) => {
         documento.asientos_contables.forEach((_, ascoIndex) => {
@@ -620,6 +643,10 @@ onMounted(async () => {
     getPucs();
     getTipoTerceros();
     getCentroDeCosto();
+}
+
+onMounted(async () => {
+    callData()
 })
 
 </script>
